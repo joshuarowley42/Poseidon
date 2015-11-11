@@ -36,4 +36,13 @@ PRINTER_CREDENTIALS = [{'name': 'alpha',
                         'api-key': '66FD2F821BBF4A7BA2E889EECD29FFEE'},
                        {'name': 'lima',
                         'host': '192.168.0.231',
-                        'api-key': 'F44C344BBD0941749784137141752A21'}]
+                        'api-key': 'F44C344BBD0941749784137141752A21'},
+                       {'name': 'mike',
+                        'host': '192.168.0.232',
+                        'api-key': '979BF1606CEE46FEAA890FC9C4C88FBB'}]
+
+THREADING = True
+if THREADING:
+    TIMEOUT = 1
+else:
+    TIMEOUT = 0.5
