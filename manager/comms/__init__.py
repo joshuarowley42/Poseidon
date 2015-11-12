@@ -2,34 +2,37 @@ __author__ = 'rowley'
 
 import requests
 import json
-from manager.config import *
+from config import *
 
 
 class Printer:
-    def __init__(self, name, host, api_key, debug=False):
+    def __init__(self, name, host, api_key, dock, debug=False):
         self.name = name
         self.host = host
+        self.dock_location = dock
         self.online = True
+        self.selected = False
         self.api_key = api_key
         self.debug = debug
         self.state = None
         self.temperature = {}
-        self.files = None
+        self.files = []
     
     def get_status(self):
         headers = {"X-Api-Key": self.api_key}
         try:
             r = requests.get("http://{host}/api/connection".format(host=self.host), headers=headers, timeout=TIMEOUT)
         except:
+            self.state = 'Connection to Pi Failed'
             self.online = False
             return
         if r.status_code != 200:
-            print r.status_code
+            print "Connection {0} - {1}".format(self.name, r.status_code)
             self.online = False
             return
         response = json.loads(r.content)
-        if response['current']['state'] == 'Closed':
-            self.state = response['current']['state']
+        if response['current']['state'] not in ['Printing', 'Operational']:
+            self.state = response['current']['state'].strip()
             self.online = False
             return
 
@@ -37,10 +40,11 @@ class Printer:
         try:
             r = requests.get("http://{host}/api/printer".format(host=self.host), headers=headers, timeout=TIMEOUT)
         except:
+            self.state = 'Connection to Pi Failed'
             self.online = False
             return
         if r.status_code != 200:
-            print r.status_code
+            print "Printer {0} - {1}".format(self.name, r.status_code)
             self.online = False
             return
         else:
@@ -126,3 +130,21 @@ class Printer:
             return None
 
         return True
+
+    def kill(self):
+        if not self.online:
+            return None
+        headers = {"X-Api-Key": self.api_key,
+                   "Content-Type": "application/json"}
+        command = {"command": "cancel"
+                   }
+        command_json = json.dumps(command)
+        r = requests.post("http://{host}/api/job".format(host=self.host),
+                          headers=headers,
+                          data=command_json)
+        print r.status_code
+
+
+    def dock(self):
+        self.send_gcode("G1 X{0} F3000".format(self.dock_location[0]))
+        self.send_gcode("G1 Y{0} F3000".format(self.dock_location[1]))
