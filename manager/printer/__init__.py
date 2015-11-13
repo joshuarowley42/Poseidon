@@ -91,6 +91,15 @@ class Printer:
                 self.files.append(file['name'])
         return self.files
 
+    def upload_file(self, filename):
+        if not self.online:
+            return
+        headers = {"X-Api-Key": self.api_key}
+        file = {'file': open(filename, 'rb')}
+        r = requests.post('http://{host}/api/files/local'.format(host=self.host, filename=filename), files=file, headers=headers)
+        print r.status_code
+        print r.content
+
     def set_tool_temp(self, target):
         if not self.online:
             return
