@@ -55,7 +55,7 @@ PRINTER_CREDENTIALS = [{'name': 'alpha',
                         'dock': [75, 240]},
                        {'name': 'oscar',
                         'host': '192.168.0.234',
-                        'api-key': '979BF1606CEE46FEAA890FC9C4C88FBB',
+                        'api-key': '439D60AC2E9048729EB6C6340BCC325B',
                         'dock': [75, 238]}]
 
 THREADING = True

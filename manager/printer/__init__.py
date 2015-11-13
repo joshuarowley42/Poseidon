@@ -155,5 +155,6 @@ class Printer:
 
 
     def dock(self):
+        self.send_gcode("G28 X0 Y0")
         self.send_gcode("G1 X{0} F3000".format(self.dock_location[0]))
         self.send_gcode("G1 Y{0} F3000".format(self.dock_location[1]))

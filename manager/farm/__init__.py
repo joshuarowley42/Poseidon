@@ -64,7 +64,7 @@ class Farm:
         printers = []
         for printer in self.printers:
             if re.match(name.lower(), printer.name.lower()) is not None:
-                print printer.name
+                #print printer.name
                 printers.append(printer)
         return printers
 
@@ -72,7 +72,7 @@ class Farm:
         printers = []
         for printer in self.printers:
             if re.match(status.lower(), printer.state.lower()) is not None:
-                print printer.state
+                #print printer.state
                 printers.append(printer)
         return printers
 
