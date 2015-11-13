@@ -102,8 +102,9 @@ class Printer:
         file = {'file': open(filename, 'rb')}
         r = requests.post('http://{host}/api/files/local'.format(host=self.host, filename=filename), files=file, headers=headers)
         if r.status_code != 201:
-            print "Not Uploaded {filename} to {host} - Error {0}".format(r.status_code, filename=filename, host=self.name)
-
+            print "Upload Failed on {host} - HTTP Code {0}".format(r.status_code, filename=filename, host=self.name)
+        else:
+            print "Upload Successful on {0}".format(self.name)
     def set_tool_temp(self, target):
         if not self.online:
             return
