@@ -63,6 +63,8 @@ class Farm:
     def printers_by_name(self, name):
         printers = []
         for printer in self.printers:
+            if not printer.online:
+                continue
             if re.match(name.lower(), printer.name.lower()) is not None:
                 #print printer.name
                 printers.append(printer)
@@ -71,6 +73,8 @@ class Farm:
     def printers_by_status(self, status):
         printers = []
         for printer in self.printers:
+            if not printer.online:
+                continue
             if re.match(status.lower(), printer.state.lower()) is not None:
                 #print printer.state
                 printers.append(printer)
@@ -153,6 +157,12 @@ class Farm:
                 available_files.append(filename)
 
         return available_files
+
+    def upload_file(self, printers=None):
+        if printers is None:
+            printers = self.printers
+        for printer in printers:
+            printer.upload_file()
 
 if __name__ == "__main__":
     farm = Farm()

@@ -1,4 +1,5 @@
 import cmd
+import os
 
 class Interface(cmd.Cmd):
     """Simple command processor for print farm."""
@@ -70,18 +71,26 @@ class Interface(cmd.Cmd):
 
     def do_u(self, line):
         """Update status of print farm"""
-        farm.update()
-        farm.print_status()
+        self.farm.update()
+        self.farm.print_status()
 
     def do_dock(self, line):
         """Dock selected printers"""
-        for printer in farm.printers_by_selected():
+        for printer in self.farm.printers_by_selected():
             printer.dock()
 
     def do_kill(self, line):
         """Kill prints on selected printers"""
-        for printer in farm.printers_by_selected():
+        for printer in self.farm.printers_by_selected():
             printer.kill()
+
+    def do_upload(self, path):
+        filenames = os.listdir(path)
+        for filename in filenames:
+            if filename[:6] == '.gcode':
+                full_path = os.path.join(path, filename)
+                print full_path
+                self.farm.upload_file(self.farm.printers_by_selected())
 
     def do_q(self, line):
         """Quit"""
