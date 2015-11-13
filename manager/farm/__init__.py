@@ -158,11 +158,11 @@ class Farm:
 
         return available_files
 
-    def upload_file(self, printers=None):
+    def upload_file(self, filename, printers=None):
         if printers is None:
             printers = self.printers
         for printer in printers:
-            printer.upload_file()
+            printer.upload_file(filename)
 
 if __name__ == "__main__":
     farm = Farm()

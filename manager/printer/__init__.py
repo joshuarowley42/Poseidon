@@ -3,7 +3,7 @@ __author__ = 'rowley'
 import requests
 import json
 from config import *
-
+import os
 
 class Printer:
     def __init__(self, name, host, api_key, dock, debug=False):
@@ -89,16 +89,20 @@ class Printer:
             self.files = []
             for file in files:
                 self.files.append(file['name'])
+        self.files.sort()
         return self.files
 
     def upload_file(self, filename):
         if not self.online:
             return
+        if os.path.split(filename)[1] in self.files:
+            print "File already on {0}".format(self.name)
+            return
         headers = {"X-Api-Key": self.api_key}
         file = {'file': open(filename, 'rb')}
         r = requests.post('http://{host}/api/files/local'.format(host=self.host, filename=filename), files=file, headers=headers)
-        print r.status_code
-        print r.content
+        if r.status_code != 201:
+            print "Not Uploaded {filename} to {host} - Error {0}".format(r.status_code, filename=filename, host=self.name)
 
     def set_tool_temp(self, target):
         if not self.online:

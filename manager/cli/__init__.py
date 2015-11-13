@@ -85,13 +85,16 @@ class Interface(cmd.Cmd):
             printer.kill()
 
     def do_upload(self, path):
+        if path == '':
+            path = "/media/PrintFarm/GCode"
         filenames = os.listdir(path)
         for filename in filenames:
-            if filename[:6] == '.gcode':
+            if filename[-6:] == '.gcode':
                 full_path = os.path.join(path, filename)
                 print full_path
-                self.farm.upload_file(self.farm.printers_by_selected())
-
+                self.farm.upload_file(full_path, self.farm.printers_by_selected())
+            else:
+                print 'Not Uploaded{0}'.format(filename)
     def do_q(self, line):
         """Quit"""
         return True
