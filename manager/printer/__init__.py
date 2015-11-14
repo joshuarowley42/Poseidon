@@ -17,8 +17,10 @@ class Printer:
         self.state = None
         self.temperature = {}
         self.files = []
+        self.job_status = None
     
     def get_status(self):
+        self.online = True
         headers = {"X-Api-Key": self.api_key}
         try:
             r = requests.get("http://{host}/api/connection".format(host=self.host), headers=headers, timeout=TIMEOUT)
@@ -61,6 +63,17 @@ class Printer:
             self.state = status['state']['text']
             self.temperature = status['temperature']
 
+        if self.state == 'Printing':
+            r = requests.get("http://{host}/api/job".format(host=self.host), headers=headers, timeout=TIMEOUT)
+            if r.status_code == 200:
+                job_status = json.loads(r.content)
+                self.job_status = {'time_left': job_status['progress']['printTimeLeft'],
+                                   'percent': float(job_status['progress']['completion'])}
+
+        else:
+            self.job_status = None
+
+
     def send_gcode(self, message):
         if not self.online:
             return
@@ -82,8 +95,7 @@ class Printer:
         headers = {"X-Api-Key": self.api_key}
         r = requests.get("http://{host}/api/files".format(host=self.host), headers=headers, timeout=TIMEOUT)
         if r.status_code != 200:
-            self.files = None
-            return None
+            self.files = []
         else:
             files = json.loads(r.content)['files']
             self.files = []

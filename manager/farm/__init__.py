@@ -47,17 +47,20 @@ class Farm:
         print "Last Update: {0}".format(strftime("%H:%M:%S", self.last_update))
         for printer in self.printers:
             if printer.online:
-                print "{sel} {0} {padding} {host} - {1}, {2}  \t{3}".format(printer.name,
-                                                                            printer.temperature['bed']['actual'],
-                                                                            printer.temperature['tool0']['actual'],
-                                                                            printer.state,
-                                                                            host=printer.host,
+                print "{sel} {ip} {0} {padding} - {b} ({bt}),\t{t} ({tt})  \t{state} {progress}%".format(printer.name,
+                                                                            b=printer.temperature['bed']['actual'],
+                                                                            bt=printer.temperature['bed']['target'],
+                                                                            t=printer.temperature['tool0']['actual'],
+                                                                            tt=printer.temperature['tool0']['target'],
+                                                                            state=printer.state,
+                                                                            ip=printer.host.split(".")[-1],
                                                                             padding=' '*(10-len(printer.name)),
-                                                                            sel='-->' if printer.selected else '   ')
+                                                                            sel='-->' if printer.selected else '   ',
+                                                                            progress='{0}'.format(printer.job_status['percent']) if printer.job_status is not None else '')
             else:
-                print "    {0} {padding} {host} - xx.x, xxx.x  \t{state}".format(printer.name,
+                print "    {ip} {0} {padding} - {state}".format(printer.name,
                                                                                  state = printer.state,
-                                                                                 host=printer.host,
+                                                                                 ip=printer.host.split(".")[-1],
                                                                                  padding=' '*(10-len(printer.name)))
 
     def printers_by_name(self, name):
@@ -88,6 +91,10 @@ class Farm:
         return printers
 
     def start_print(self, printers, filename):
+        available_files = self.get_files(printers)
+        for a_fname in available_files:
+            if filename == a_fname[:len(filename)]:
+                filename = a_fname
         for printer in printers:
             printer.select_file(filename, start_print=True)
 
@@ -155,7 +162,7 @@ class Farm:
         for filename in filenames.keys():
             if len(filenames[filename]) == len(printers):
                 available_files.append(filename)
-
+        available_files.sort()
         return available_files
 
     def upload_file(self, filename, printers=None):
