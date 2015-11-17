@@ -47,7 +47,7 @@ class Farm:
         print "Last Update: {0}".format(strftime("%H:%M:%S", self.last_update))
         for printer in self.printers:
             if printer.online:
-                print "{sel} {ip} {0} {padding} - {b} ({bt}),\t{t} ({tt})  \t{state} {progress}%".format(printer.name,
+                print "{sel} {ip} {0} {padding} - {b} ({bt}),\t{t} ({tt})  \t{state} {progress}% {time}".format(printer.name,
                                                                             b=printer.temperature['bed']['actual'],
                                                                             bt=printer.temperature['bed']['target'],
                                                                             t=printer.temperature['tool0']['actual'],
@@ -56,7 +56,9 @@ class Farm:
                                                                             ip=printer.host.split(".")[-1],
                                                                             padding=' '*(10-len(printer.name)),
                                                                             sel='-->' if printer.selected else '   ',
-                                                                            progress='{0}'.format(printer.job_status['percent']) if printer.job_status is not None else '')
+                                                                            progress='{0}'.format(printer.job_status['percent']) if printer.job_status is not None else '',
+                                                                            time='{0}'.format(strftime("%H:%M:%S", gmtime(printer.job_status['time_left']))) if printer.job_status is not None else '')
+
             else:
                 print "    {ip} {0} {padding} - {state}".format(printer.name,
                                                                                  state = printer.state,

@@ -36,8 +36,10 @@ class Interface(cmd.Cmd):
         self.farm.print_status()
 
     def complete_s(self, text, line, begidx, endidx):
-        if not text:
+        if text == "":
             completions = [p.name for p in self.farm.printers]
+        else:
+            completions = [p.name for p in self.farm.printers if p.name.startswith(text)]
         return completions
 
     def do_t(self, temp):
@@ -64,6 +66,15 @@ class Interface(cmd.Cmd):
             self.farm.start_print(self.farm.printers_by_selected(), filename)
         else:
             print 'File not available'
+
+    def complete_p(self, text, line, begidx, endidx):
+        """Show files available on selected printers"""
+        filenames = self.farm.get_files(self.farm.printers_by_selected())
+        if text == "":
+            return filenames
+        else:
+            return [f for f in filenames if filename.startswith(text)]	
+
 
     def do_g(self, line):
         """Send G-Code to selected printers"""

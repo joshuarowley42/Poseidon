@@ -67,8 +67,8 @@ class Printer:
             r = requests.get("http://{host}/api/job".format(host=self.host), headers=headers, timeout=TIMEOUT)
             if r.status_code == 200:
                 job_status = json.loads(r.content)
-                self.job_status = {'time_left': job_status['progress']['printTimeLeft'],
-                                   'percent': float(job_status['progress']['completion'])}
+                self.job_status = {'time_left': int(job_status['progress']['printTimeLeft']),
+                                   'percent': int(float(job_status['progress']['completion'])*10)/10.0}
 
         else:
             self.job_status = None
