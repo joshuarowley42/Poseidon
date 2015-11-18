@@ -95,6 +95,9 @@ class Interface(cmd.Cmd):
         for printer in self.farm.printers_by_selected():
             printer.kill()
 
+    def do_script(self, line):
+        self.farm.run_script(line, self.farm.printers_by_selected())
+
     def do_upload(self, path):
         if path == '':
             path = "/media/PrintFarm/GCode"

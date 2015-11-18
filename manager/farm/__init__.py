@@ -167,6 +167,17 @@ class Farm:
         available_files.sort()
         return available_files
 
+    def run_script(self, script_name, printers=None):
+        if script_name not in SCRIPTS.keys():
+            print 'Script not found'
+            return
+        if printers is None:
+            printers = self.printers
+        for printer in printers:
+            commands = SCRIPTS[script_name]
+            for command in commands:
+                printer.send_gcode(command)
+
     def upload_file(self, filename, printers=None):
         if printers is None:
             printers = self.printers
