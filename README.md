@@ -38,6 +38,7 @@ Installation
 ------------
 
 Quick Instructions
+
     1. Install the python requests module: (e.g. `sudo apt-get install python-requests`).
     2. Create and change into the Poseidon directory: `mkdir Poseidon; cd Poseidon`
     3. Checkout Poseidon: `git clone https://github.com/joshuarowley42/Poseidon.git`
@@ -45,6 +46,7 @@ Quick Instructions
     5. Run the manager: `python run.py`
 
 Proper Instructions
+
     1. Create and change into folder for Poseidon
     2. Create a virtualenv: `virtualenv .`
     3. Activate virtualenv: `source bin/activate`
