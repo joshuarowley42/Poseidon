@@ -3,7 +3,6 @@ from config import *
 from time import sleep, strftime, gmtime
 from multiprocessing.dummy import Pool as ThreadPool
 from multiprocessing import Process
-import re
 
 
 class Farm:
@@ -16,6 +15,7 @@ class Farm:
                                          printer['dock']))
         self.last_update = None
         self.update()
+        self.print_status(True)
 
     def map_x(self, f, o):
         if THREADING:
@@ -43,35 +43,36 @@ class Farm:
                 printers.append(printer)
         self.printers = printers
 
-    def print_status(self):
+    def print_status(self, show_details=False):
         print "Last Update: {0}".format(strftime("%H:%M:%S", self.last_update))
+        print "    IP  Name          Bed   SetPoint    HE     SetPoint Status   %     Time Remaining"
         for printer in self.printers:
             if printer.online:
-                print "{sel} {ip} {0} {padding} - {b} ({bt}),\t{t} ({tt})  \t{state} {progress}% {time}".format(printer.name,
-                                                                            b=printer.temperature['bed']['actual'],
-                                                                            bt=printer.temperature['bed']['target'],
-                                                                            t=printer.temperature['tool0']['actual'],
-                                                                            tt=printer.temperature['tool0']['target'],
-                                                                            state=printer.state,
-                                                                            ip=printer.host.split(".")[-1],
-                                                                            padding=' '*(10-len(printer.name)),
-                                                                            sel='-->' if printer.selected else '   ',
-                                                                            progress='{0}'.format(printer.job_status['percent']) if printer.job_status is not None else '',
-                                                                            time='{0}'.format(strftime("%H:%M:%S", gmtime(printer.job_status['time_left']))) if printer.job_status is not None else '')
+                info = "   {b}  {bt}  \t{t}  {tt}   \t{state} {progress} {time}".format(b=printer.temperature['bed']['actual'] if show_details else ' '*len(str(printer.temperature['bed']['actual'])),
+                                                                                        bt=printer.temperature['bed']['target'] if show_details else ' '*len(str(printer.temperature['bed']['target'])),
+                                                                                        t=printer.temperature['tool0']['actual'] if show_details else ' '*len(str(printer.temperature['tool0']['actual'])),
+                                                                                        tt=printer.temperature['tool0']['target'] if show_details else ' '*len(str(printer.temperature['tool0']['target'])),
+                                                                                        state=printer.state,
+                                                                                        progress='{0}%'.format(printer.job_status['percent']) if printer.job_status is not None and show_details else '',
+                                                                                        time='{0}'.format(strftime("%H:%M:%S", gmtime(printer.job_status['time_left']))) if printer.job_status is not None and show_details else '')
+                print "{sel} {ip} {name} {padding}{info}".format(sel='-->' if printer.selected else '   ',
+                                                                 ip=printer.host.split(".")[-1],
+                                                                 name=printer.name,
+                                                                 padding=' '*(10-len(printer.name)),
+                                                                 info=info)
 
             else:
-                print "    {ip} {0} {padding} - {state}".format(printer.name,
-                                                                                 state = printer.state,
-                                                                                 ip=printer.host.split(".")[-1],
-                                                                                 padding=' '*(10-len(printer.name)))
+                print "    {ip} {name} {padding} - {state}".format(ip=printer.host.split(".")[-1],
+                                                                   name=printer.name,
+                                                                   padding=' '*(10-len(printer.name)),
+                                                                   state=printer.state)
 
     def printers_by_name(self, name):
         printers = []
         for printer in self.printers:
             if not printer.online:
                 continue
-            if re.match(name.lower(), printer.name.lower()) is not None:
-                #print printer.name
+            if printer.name.lower().startswith(name.lower()):
                 printers.append(printer)
         return printers
 
@@ -80,8 +81,7 @@ class Farm:
         for printer in self.printers:
             if not printer.online:
                 continue
-            if re.match(status.lower(), printer.state.lower()) is not None:
-                #print printer.state
+            if printer.state.lower().startswith(status.lower()):
                 printers.append(printer)
         return printers
 

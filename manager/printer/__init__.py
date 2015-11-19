@@ -74,17 +74,17 @@ class Printer:
             self.job_status = None
 
 
-    def send_gcode(self, message):
+    def send_gcode(self, command):
         if not self.online:
             return
         headers = {"X-Api-Key": self.api_key,
                    "Content-Type": "application/json"}
-        command = {"command": message}
-        command_json = json.dumps(command)
-
+        command = command.format(printer=self)
+        data = {"command": command}
+        data = json.dumps(data)
         r = requests.post("http://{host}/api/printer/command".format(host=self.host),
                           headers=headers,
-                          data=command_json,
+                          data=data,
                           timeout=0.5)
         if r.status_code != 204:
             print 'Error - {0}'.format(r.status_code)
@@ -117,6 +117,7 @@ class Printer:
             print "Upload Failed on {host} - HTTP Code {0}".format(r.status_code, filename=filename, host=self.name)
         else:
             print "Upload Successful on {0}".format(self.name)
+
     def set_tool_temp(self, target):
         if not self.online:
             return
@@ -178,9 +179,3 @@ class Printer:
                           headers=headers,
                           data=command_json)
         print r.status_code
-
-
-    def dock(self):
-        self.send_gcode("G28 X0 Y0")
-        self.send_gcode("G1 X{0} F3000".format(self.dock_location[0]))
-        self.send_gcode("G1 Y{0} F3000".format(self.dock_location[1]))

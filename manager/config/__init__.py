@@ -58,8 +58,14 @@ PRINTER_CREDENTIALS = [{'name': 'alpha',
                         'api-key': '439D60AC2E9048729EB6C6340BCC325B',
                         'dock': [75, 238]}]
 
-SCRIPTS = {'clean': ['G1 Z100','G1 X150 Y0'],
-           'purge': ['G92 E0', 'G1 E20 F300', 'G92 E0']}
+SCRIPTS = {'clean': ['G1 Z100',
+                     'G1 X150 Y0'],
+           'purge': ['G92 E0',
+                     'G1 E20 F300',
+                     'G92 E0'],
+           'dock':  ['G28 X0 Y0',
+                     'G1 X{printer.dock_location[0]} F3000',
+                     'G1 Y{printer.dock_location[1]} F3000']}
 
 THREADING = True
 if THREADING:
